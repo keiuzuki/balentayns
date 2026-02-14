@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my Valentine?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab, #ffc0cb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .question {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-yes {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255,20,147,0.4);
+        }
+
+        .btn-no {
+            background: linear-gradient(45deg, #dc143c, #ff6b6b);
+            color: white;
+            position: relative;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .btn-no:hover {
+            transform: scale(1.05);
+        }
+
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .flower-bouquet {
+            margin: 2rem 0;
+        }
+
+        .bouquet-image {
+            width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes bouquet3D {
+            0%, 100% { 
+                transform: perspective(1000px) rotateY(0deg) scale(1) translateY(0);
+            }
+            25% { 
+                transform: perspective(1000px) rotateY(15deg) scale(1.1) translateY(-20px);
+            }
+            50% { 
+                transform: perspective(1000px) rotateY(-15deg) scale(1.2) translateY(-30px);
+            }
+            75% { 
+                transform: perspective(1000px) rotateY(10deg) scale(1.1) translateY(-20px);
+            }
+        }
+
+        .success-message {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .flower-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .flower {
+            font-size: 4rem;
+            animation: sway 3s ease-in-out infinite;
+            animation-delay: calc(var(--delay) * 0.2s);
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .extra-message {
+            font-size: 1.5rem;
+            color: white;
+            margin-top: 2rem;
+            opacity: 0.9;
+        }
+
+        .heart-animation {
+            margin-bottom: 2rem;
+        }
+
+        .heart-gif {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <!-- Screen 1: Question -->
+        <div class="screen active" id="screen1">
+            <div class="heart-animation">
+                <img src="images/heart.gif" alt="Heart Animation" class="heart-gif">
+            </div>
+            <h1 class="question">Will you be my Valentine? 💕</h1>
+            <div class="buttons">
+                <button class="btn btn-yes" onclick="goToConfirmation()">Yes</button>
+                <button class="btn btn-no" id="noBtn" onmouseover="moveNoButton()">No</button>
+            </div>
+        </div>
+
+        <!-- Screen 1.5: Confirmation -->
+        <div class="screen" id="screen1-5">
+            <div class="heart-animation">
+                <img src="images/are u sure.gif" alt="Are You Sure Animation" class="heart-gif">
+            </div>
+            <h1 class="question">Are you sure you want to be my Valentine? 🤔</h1>
+            <div class="buttons">
+                <button class="btn btn-yes" onclick="sayYes()">Yes, I'm sure!</button>
+                <button class="btn btn-no" id="noBtn2" onmouseover="moveNoButton2()">No, let me think</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Flower Bouquet -->
+        <div class="screen" id="screen2">
+            <h1 class="success-message">Yay! I'm so happy! 💖</h1>
+            <div class="flower-bouquet">
+                <img src="images/cat-meme-elgatitolover.gif" alt="Cat Meme" class="bouquet-image">
+            </div>
+            <p class="extra-message">You've made my day! Love you forever!</p>
+        </div>
+    </div>
+
+    <script>
+        // Create floating hearts background
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💝'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+
+        // Move No button away from mouse
+        function moveNoButton() {
+            const noBtn = document.getElementById('noBtn');
+            const container = document.querySelector('.container');
+            
+            // Calculate random position within full viewport bounds
+            const maxX = window.innerWidth - 150;
+            const maxY = window.innerHeight - 100;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            // Apply new position with fixed angle (no rotation)
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            noBtn.style.transform = 'scale(1.1)';
+            noBtn.style.zIndex = '1000';
+            
+            // Add some fun messages
+            const messages = [
+                "Are you sure?",
+                "Think again!",
+                "Don't be shy!",
+                "Say yes please!",
+                "I'll be sad!",
+                "Catch me if you can!",
+                "You can't get me!",
+                "Try again!"
+            ];
+            noBtn.textContent = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Add shadow effect for depth
+            noBtn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+        }
+
+        // Go to confirmation screen
+        function goToConfirmation() {
+            const screen1 = document.getElementById('screen1');
+            const screen1_5 = document.getElementById('screen1-5');
+            
+            screen1.classList.remove('active');
+            screen1_5.classList.add('active');
+        }
+
+        // Move No button 2 away from mouse
+        function moveNoButton2() {
+            const noBtn2 = document.getElementById('noBtn2');
+            
+            // Calculate random position within full viewport bounds
+            const maxX = window.innerWidth - 200;
+            const maxY = window.innerHeight - 100;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            // Apply new position with fixed angle (no rotation)
+            noBtn2.style.position = 'fixed';
+            noBtn2.style.left = randomX + 'px';
+            noBtn2.style.top = randomY + 'px';
+            noBtn2.style.transform = 'scale(1.1)';
+            noBtn2.style.zIndex = '1000';
+            
+            // Add some fun messages
+            const messages = [
+                "Really sure?",
+                "Think about it!",
+                "Are you certain?",
+                "Double check!",
+                "Take your time!",
+                "Maybe reconsider?",
+                "Are you positive?",
+                "Last chance!"
+            ];
+            noBtn2.textContent = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Add shadow effect for depth
+            noBtn2.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+        }
+
+        // Handle Yes button click
+        function sayYes() {
+            const screen1 = document.getElementById('screen1');
+            const screen1_5 = document.getElementById('screen1-5');
+            const screen2 = document.getElementById('screen2');
+            
+            screen1.classList.remove('active');
+            screen1_5.classList.remove('active');
+            screen2.classList.add('active');
+            
+            // Create celebration effect
+            createCelebration();
+        }
+
+        // Create celebration effect
+        function createCelebration() {
+            const colors = ['#ff1493', '#ff69b4', '#ffc0cb', '#ff6b9d', '#ff8fab'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'fixed';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = '-10px';
+                    particle.style.width = '10px';
+                    particle.style.height = '10px';
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.borderRadius = '50%';
+                    particle.style.pointerEvents = 'none';
+                    particle.style.zIndex = '1000';
+                    particle.style.animation = 'fall 3s linear forwards';
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 3000);
+                }, i * 100);
+            }
+        }
+
+        // Add falling animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            createHearts();
+        });
+
+        // Add touch support for mobile
+        document.getElementById('noBtn').addEventListener('touchstart', moveNoButton);
+        document.getElementById('noBtn2').addEventListener('touchstart', moveNoButton2);
+    </script>
+</body>
+</html>
